@@ -30,10 +30,15 @@ export default function MasterList({ loading, slots, onSelect }: Props) {
     setSelectedSlot(null)
   }
 
-  const chooseSlot = (time: string) => {
-    setSelectedSlot(time)
-    onSelect(selectedMaster, time)
-  }
+  const chooseSlot = (master: Master, time: string) => {
+    // выбрать мастера, если ещё не выбран или выбран другой
+    setSelectedMaster(master);
+    // выбрать конкретное время
+    setSelectedSlot(time);
+    // отдать результат наверх
+    onSelect(master, time);
+  };
+  
 
   if (loading || !slots) return <div className="p-4 text-center">Загружаю…</div>
 
@@ -83,11 +88,10 @@ export default function MasterList({ loading, slots, onSelect }: Props) {
                         m.available_slots.map((t) => (
                             <button
                               key={t}
-                              onClick={() => chooseSlot(t)}
+                              onClick={() => chooseSlot(m, t)}
+                              style={ selectedSlot === t ? { backgroundColor: 'black' } : {}}
                               className={`rounded-full px-5 py-2 text-sm bg-gray-200 transition
-                                          ${
-                                            selectedSlot === t && 'bg-black text-white'
-                                          }`}
+                                          ${selectedSlot === t && 'text-white'}`}
                             >
                               {t}
                             </button>

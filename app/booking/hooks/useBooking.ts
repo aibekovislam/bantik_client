@@ -117,6 +117,7 @@ export function useBooking() {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, toast]);
 
   // 3) получение мастеров
@@ -146,6 +147,7 @@ export function useBooking() {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, toast]);
 
   // 4) отправка формы
@@ -219,6 +221,7 @@ export function useBooking() {
       ...prev,
       time: ''
     }))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.date, form.serviceIds])        
 
   return {
