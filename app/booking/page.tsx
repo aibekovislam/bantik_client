@@ -82,7 +82,7 @@ export default function BookingPage() {
                       onChange={() =>
                         setForm((f) => ({ ...f, serviceIds: [s.id] }))
                       }
-                      className="h-5 w-5 accent-pink-500"
+                      className="accent-pink-500"
                     />
                     <span className="text-lg text-gray-800">
                       {s.name} — {s.duration} мин, {s.price} сом
