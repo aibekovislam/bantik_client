@@ -33,6 +33,9 @@ export default function BookingPage() {
   const [step, setStep] = useState(1);
   const [dateError, setDateError] = useState<string | null>(null);
   
+  const currentService = services.find((s) => s.id === form.serviceIds[0]);
+  const isLongService = currentService?.is_long === true;
+
   
   const fade = {
     initial: { opacity: 0, y: 30 },
@@ -139,6 +142,12 @@ export default function BookingPage() {
                 className="w-full border-pink-300 focus:border-pink-500"
               />
 
+              {isLongService && (
+                <div className="mt-4 bg-blue-50 border border-blue-200 text-blue-800 p-3 rounded-lg text-sm">
+                  Эта услуга занимает много времени. После записи администратор свяжется с&nbsp;вами и уточнит точное время.
+                </div>
+              )}
+
               {dateError && (
                 <p className="text-red-600 text-center mt-2">{dateError}</p>
               )}
@@ -157,7 +166,7 @@ export default function BookingPage() {
                       loading={loading}
                       slots={slots}
                       onSelect={(master, time) => {
-                        setForm((f) => ({ ...f, time }));
+                        setForm((f) => ({ ...f, time: time ?? "" }));
                         setSelectedMaster(master)
                       }}
                     />
@@ -175,7 +184,7 @@ export default function BookingPage() {
 
                 <Button
                   onClick={() => setStep(5)}
-                  disabled={!form.time}
+                  disabled={isLongService ? !selectedMaster : !form.time}
                   className="bg-gradient-to-r from-rose-600 to-pink-500 text-white px-6 py-2 rounded-xl shadow hover:opacity-90 transition"
                 >
                   Далее
@@ -204,7 +213,13 @@ export default function BookingPage() {
 
                 <div className="mb-6 text-gray-700 leading-relaxed bg-pink-50 p-4 rounded-lg">
                   <p><strong>Услуга:</strong> {services.find((s) => s.id === form.serviceIds[0])?.name}</p>
-                  <p><strong>Дата/Время:</strong> {form.date} {form.time}</p>
+                  <p>
+                    <strong>Дата:</strong> {form.date}
+                    {!isLongService && form.time && <> <strong>Время:</strong> {form.time}</>}
+                    {isLongService && (
+                      <span className="text-sm text-gray-500"> (точное время сообщит администратор)</span>
+                    )}
+                  </p>
                   <p><strong>Мастер:</strong> {selectedMaster?.name}</p>
                 </div>
 
@@ -267,7 +282,7 @@ export default function BookingPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setStep(4)}
+                    onClick={() => setStep(2)}
                     className="w-full sm:w-auto border-pink-300 text-pink-600 hover:bg-pink-50 transition"
                   >
                     Назад

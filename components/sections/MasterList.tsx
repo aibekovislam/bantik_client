@@ -18,29 +18,31 @@ interface SlotsData {
 interface Props {
   loading: boolean
   slots: SlotsData | null
-  onSelect:(masterUuid: Master|null, time: string)=>void
+  /** time может быть null, когда выбираем только мастера */
+  onSelect: (master: Master | null, time: string | null) => void
 }
 
 export default function MasterList({ loading, slots, onSelect }: Props) {
   const [selectedMaster, setSelectedMaster] = useState<Master | null>(null)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
 
-  const chooseMaster = (master: Master | null, mnaster: string) => {
+  if (loading || !slots) return <div className="p-4 text-center">Загружаю…</div>
+
+  const isLong = slots.is_long_service
+
+  const chooseMaster = (master: Master) => {
     setSelectedMaster(master)
     setSelectedSlot(null)
+
+    /* Если услуга длинная — сразу передаём выбор наружу */
+    if (isLong) onSelect(master, null)
   }
 
   const chooseSlot = (master: Master, time: string) => {
-    // выбрать мастера, если ещё не выбран или выбран другой
-    setSelectedMaster(master);
-    // выбрать конкретное время
-    setSelectedSlot(time);
-    // отдать результат наверх
-    onSelect(master, time);
-  };
-  
-
-  if (loading || !slots) return <div className="p-4 text-center">Загружаю…</div>
+    setSelectedMaster(master)
+    setSelectedSlot(time)
+    onSelect(master, time)
+  }
 
   return (
     <div className="space-y-6 my-5">
@@ -71,35 +73,36 @@ export default function MasterList({ loading, slots, onSelect }: Props) {
               name="master"
               className="h-5 w-5 accent-primary"
               checked={selectedMaster?.uuid === m.uuid}
-              onChange={() => chooseMaster(m, m.name)}
+              onChange={() => chooseMaster(m)}
             />
           </label>
 
+          {/* Слоты показываем только если услуга короткая */}
+          {!isLong && (
             <>
               <p className="mt-2 font-medium text-gray-600">
                 Ближайшее время для записи <span className="font-semibold">сегодня:</span>
               </p>
 
               <div className="flex flex-wrap gap-3">
-                {
-                    m.available_slots.length === 0 ? (
-                        <p>Нету свободных записей</p>
-                    ) : (
-                        m.available_slots.map((t) => (
-                            <button
-                              key={t}
-                              onClick={() => chooseSlot(m, t)}
-                              style={ selectedSlot === t ? { backgroundColor: 'black' } : {}}
-                              className={`rounded-full px-5 py-2 text-sm bg-gray-200 transition
-                                          ${selectedSlot === t && 'text-white'}`}
-                            >
-                              {t}
-                            </button>
-                          ))
-                    )
-                }
+                {m.available_slots.length === 0 ? (
+                  <p>Нет свободных записей</p>
+                ) : (
+                  m.available_slots.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => chooseSlot(m, t)}
+                      className={`rounded-full px-5 py-2 text-sm bg-gray-200 transition ${
+                        selectedSlot === t && 'text-white bg-black'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))
+                )}
               </div>
             </>
+          )}
         </div>
       ))}
     </div>

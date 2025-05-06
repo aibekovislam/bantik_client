@@ -17,6 +17,7 @@ interface Service {
   name: string;
   duration: number;
   price: number;
+  is_long: boolean
 }
 
 interface Master {
