@@ -246,17 +246,16 @@ export default function BookingPage() {
 
               {!loading && slots && slots?.masters.length > 0 && (
                 <div className="overflow-y-auto px-2 py-2">
-                  {slots.masters.map((slot) => (
+                  {slots && (
                     <MasterList
-                      key={slot.uuid}
                       loading={loading}
                       slots={slots}
                       onSelect={(master, time) => {
-                        setForm((f) => ({ ...f, time: time ?? "" }));
+                        setForm((f) => ({ ...f, time: time ?? "" }))
                         setSelectedMaster(master)
                       }}
                     />
-                  ))}
+                  )}
                 </div>
               )}
               <div className="flex justify-between mt-8">
