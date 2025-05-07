@@ -147,30 +147,6 @@ export default function BookingPage() {
               <h2 className="text-2xl font-semibold text-center text-pink-600 mb-6 uppercase tracking-wide">
                 2. Выберите дату
               </h2>
-              {/* <Input
-                type="date"
-                value={form.date}
-                onChange={(e) => {
-                  const selectedDate = e.target.value;
-                  const today = new Date().toISOString().split("T")[0];
-                  
-                  if (selectedDate < today) {
-                    setForm((f) => ({ ...f, date: today }));
-                    setDateError('Вы не можете выбрать прошедшую дату.');
-                  } else {
-                    setForm((f) => ({ 
-                      ...f, 
-                      date: selectedDate,
-                      time: "" 
-                    }));
-                    setSlots(null);
-                    setDateError(null);
-                  }
-                }}
-                min={new Date().toISOString().split("T")[0]}
-                className="w-full border-pink-300 focus:border-pink-500"
-              /> */}
-
               <div className="bg-white p-4 rounded-xl shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <button
@@ -202,36 +178,53 @@ export default function BookingPage() {
                 ) : availableDates.length === 0 ? (
                   <p className="text-center py-6 text-yellow-600">Нет свободных дат</p>
                 ) : (
-                  <div className="grid grid-cols-7 gap-2">
-                    {/* создаём массив [1…последний_день_месяца] */}
-                    {Array.from(
-                      { length: new Date(year, month, 0).getDate() },
-                      (_, i) => i + 1
-                    ).map((day) => {
-                      const iso = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2,"0")}`
-                      const isEnabled = availableDates.includes(iso)
-                      const isSelected = form.date === iso
-
-                      return (
-                        <button
-                          key={iso}
-                          disabled={!isEnabled}
-                          onClick={() => {
-                            setForm((f) => ({ ...f, date: iso, time: "" }))
-                            setSlots(null)
-                          }}
-                          className={`aspect-square w-full rounded-md text-sm
-                            ${isEnabled
-                              ? isSelected
-                                ? "bg-rose-600 text-white"
-                                : "bg-gray-100 hover:bg-rose-100"
-                              : "bg-gray-50 text-gray-400 cursor-not-allowed"}`}
-                        >
-                          {day}
-                        </button>
-                      )
-                    })}
+                <div>
+                  <div className="grid grid-cols-7 gap-2 text-center mb-1 text-gray-500 text-sm select-none">
+                    {["Пн","Вт","Ср","Чт","Пт","Сб","Вс"].map((d) => (
+                      <span key={d}>{d}</span>
+                    ))}
                   </div>
+
+                  <div className="grid grid-cols-7 gap-2">
+                    {(() => {
+                      const elems: JSX.Element[] = []
+
+                      const jsFirstDay = new Date(year, month - 1, 1).getDay()
+                      const firstDay = (jsFirstDay + 6) % 7
+
+                      for (let i = 0; i < firstDay; i++) {
+                        elems.push(<div key={"empty-"+i} />)
+                      }
+
+                      const lastDay = new Date(year, month, 0).getDate()
+                      for (let day = 1; day <= lastDay; day++) {
+                        const iso = `${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`
+                        const isEnabled  = availableDates.includes(iso)
+                        const isSelected = form.date === iso
+
+                        elems.push(
+                          <button
+                            key={iso}
+                            disabled={!isEnabled}
+                            onClick={() => {
+                              setForm((f) => ({ ...f, date: iso, time: "" }))
+                              setSlots(null)
+                            }}
+                            className={`aspect-square w-full rounded-md text-sm
+                              ${isEnabled
+                                ? isSelected
+                                  ? "bg-rose-600 text-white"
+                                  : "bg-gray-100 hover:bg-rose-100"
+                                : "bg-gray-50 text-gray-400 cursor-not-allowed"}`}
+                          >
+                            {day}
+                          </button>
+                        )
+                      }
+                      return elems
+                    })()}
+                  </div>
+                </div>
                 )}
               </div>
 
@@ -246,7 +239,7 @@ export default function BookingPage() {
               )}
 
               {!loading && noSlots && (
-                <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200 mt-4">
                   <p className="text-yellow-700">Нет доступного времени на выбранную дату</p>
                 </div>
               )}
