@@ -1,7 +1,7 @@
 "use client";
 
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { useBooking } from "./hooks/useBooking";
 import { motion, AnimatePresence } from "framer-motion";
 import MasterList from "@/components/sections/MasterList";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { NEXT_PUBLIC_API_URL } from "../lib/consts";
 
 export default function BookingPage() {
   const {
@@ -32,6 +33,34 @@ export default function BookingPage() {
 
   const [step, setStep] = useState(1);
   const [dateError, setDateError] = useState<string | null>(null);
+
+  const today = new Date()
+  const [month, setMonth] = useState(today.getMonth() + 1)
+  const [year, setYear]   = useState(today.getFullYear())
+  const [availableDates, setAvailableDates] = useState<string[]>([])
+  const [datesLoading, setDatesLoading] = useState(false)
+
+  useEffect(() => {
+    if (!form.serviceIds.length) return
+    const service_id = form.serviceIds[0]
+  
+    const load = async () => {
+      setDatesLoading(true)
+      try {
+        const res = await fetch(
+          `${NEXT_PUBLIC_API_URL}/available-dates/?month=${month}&year=${year}&service_id=${service_id}`
+        )
+        const data = await res.json()
+        setAvailableDates(data.available_dates ?? [])
+      } catch (e) {
+        console.error(e)
+        setAvailableDates([])
+      } finally {
+        setDatesLoading(false)
+      }
+    }
+    load()
+  }, [month, year, form.serviceIds])
   
   const currentService = services.find((s) => s.id === form.serviceIds[0]);
   const isLongService = currentService?.is_long === true;
@@ -118,7 +147,7 @@ export default function BookingPage() {
               <h2 className="text-2xl font-semibold text-center text-pink-600 mb-6 uppercase tracking-wide">
                 2. Выберите дату
               </h2>
-              <Input
+              {/* <Input
                 type="date"
                 value={form.date}
                 onChange={(e) => {
@@ -140,7 +169,71 @@ export default function BookingPage() {
                 }}
                 min={new Date().toISOString().split("T")[0]}
                 className="w-full border-pink-300 focus:border-pink-500"
-              />
+              /> */}
+
+              <div className="bg-white p-4 rounded-xl shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <button
+                    onClick={() =>
+                      setMonth((m) => (m === 1 ? (setYear(y => y - 1), 12) : m - 1))
+                    }
+                    className="text-2xl px-2"
+                  >
+                    ‹
+                  </button>
+                  <span className="font-medium">
+                    {new Date(year, month - 1).toLocaleDateString("ru-RU", {
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setMonth((m) => (m === 12 ? (setYear(y => y + 1), 1) : m + 1))
+                    }
+                    className="text-2xl px-2"
+                  >
+                    ›
+                  </button>
+                </div>
+
+                {datesLoading ? (
+                  <p className="text-center py-6 text-gray-500">Загружаю даты…</p>
+                ) : availableDates.length === 0 ? (
+                  <p className="text-center py-6 text-yellow-600">Нет свободных дат</p>
+                ) : (
+                  <div className="grid grid-cols-7 gap-2">
+                    {/* создаём массив [1…последний_день_месяца] */}
+                    {Array.from(
+                      { length: new Date(year, month, 0).getDate() },
+                      (_, i) => i + 1
+                    ).map((day) => {
+                      const iso = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2,"0")}`
+                      const isEnabled = availableDates.includes(iso)
+                      const isSelected = form.date === iso
+
+                      return (
+                        <button
+                          key={iso}
+                          disabled={!isEnabled}
+                          onClick={() => {
+                            setForm((f) => ({ ...f, date: iso, time: "" }))
+                            setSlots(null)
+                          }}
+                          className={`aspect-square w-full rounded-md text-sm
+                            ${isEnabled
+                              ? isSelected
+                                ? "bg-rose-600 text-white"
+                                : "bg-gray-100 hover:bg-rose-100"
+                              : "bg-gray-50 text-gray-400 cursor-not-allowed"}`}
+                        >
+                          {day}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
 
               {isLongService && (
                 <div className="mt-4 bg-blue-50 border border-blue-200 text-blue-800 p-3 rounded-lg text-sm">
@@ -280,19 +373,19 @@ export default function BookingPage() {
 
                 <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
                   <Button
+                    type="submit"
+                    disabled={submitting || loading || !form.clientName || !form.clientPhone}
+                    className="w-full sm:w-auto bg-gradient-to-r from-rose-600 to-pink-500 text-white px-8 py-2 rounded-xl shadow-lg hover:opacity-90 transition text-lg font-bold"
+                  >
+                    {submitting ? "Отправка..." : "Подтвердить"}
+                  </Button>
+                  <Button
                     type="button"
                     variant="outline"
                     onClick={() => setStep(2)}
                     className="w-full sm:w-auto border-pink-300 text-pink-600 hover:bg-pink-50 transition"
                   >
                     Назад
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={submitting || loading || !form.clientName || !form.clientPhone}
-                    className="w-full sm:w-auto bg-gradient-to-r from-rose-600 to-pink-500 text-white px-8 py-2 rounded-xl shadow-lg hover:opacity-90 transition text-lg font-bold"
-                  >
-                    {submitting ? "Отправка..." : "Подтвердить"}
                   </Button>
                 </div>
               </Card>

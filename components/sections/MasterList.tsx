@@ -84,17 +84,19 @@ export default function MasterList({ loading, slots, onSelect }: Props) {
                 Ближайшее время для записи <span className="font-semibold">сегодня:</span>
               </p>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="grid grid-cols-4 gap-3 md:grid-cols-6">
                 {m.available_slots.length === 0 ? (
-                  <p>Нет свободных записей</p>
+                  <p className="col-span-4 text-center">Нет свободных записей</p>
                 ) : (
                   m.available_slots.map((t) => (
                     <button
                       key={t}
                       onClick={() => chooseSlot(m, t)}
-                      className={`rounded-full px-5 py-2 text-sm bg-gray-200 transition ${
-                        selectedSlot === t && 'text-white bg-black'
-                      }`}
+                      className={`w-full rounded-full py-2 text-sm text-center transition
+                        ${selectedMaster?.uuid === m.uuid && selectedSlot === t
+                          ? 'text-white bg-black'
+                          : 'bg-gray-200'
+                        }`}
                     >
                       {t}
                     </button>
