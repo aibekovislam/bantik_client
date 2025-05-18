@@ -79,7 +79,7 @@ export default function BookingPage() {
       </Head>
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 py-12 px-2 font-inter">
       <h1 className="text-center text-5xl font-extrabold text-rose-600 mb-6 tracking-wide">
-        VIP Запись в Bantik
+        Bantik
       </h1>
 
       {error && (
@@ -100,27 +100,42 @@ export default function BookingPage() {
             transition={{ duration: 0.4 }}
           >
             <Card>
-              <h2 className="text-2xl font-semibold text-center text-pink-600 mb-6 uppercase tracking-wide">
-                1. Выберите услугу
+              <h2 className="text-2xl font-semibold text-left text-pink-600 mb-6 uppercase tracking-wide">
+                Услуги
               </h2>
-              <div className="space-y-4 overflow-y-auto px-2">
-                {services.map((s) => (
-                  <label key={s.id} className="flex items-center space-x-3">
-                    <input
-                      type="radio"
-                      name="service"
-                      value={s.id}
-                      checked={form.serviceIds[0] === s.id}
-                      onChange={() =>
-                        setForm((f) => ({ ...f, serviceIds: [s.id] }))
-                      }
-                      className="accent-pink-500"
-                    />
-                    <span className="text-lg text-gray-800">
-                      {s.name} — {s.duration} мин, {s.price} сом
-                    </span>
-                  </label>
-                ))}
+              <div className="space-y-4 overflow-y-auto">
+              {services.map(s => (
+                <label
+                  key={s.id}
+                  className="flex"
+                >
+                  {/* контент: title, description и price */}
+                  <div className="flex-1">
+                    {/* заголовок */}
+                    <div className="text-base font-regular text-black">
+                      {s.name}
+                    </div>
+                    {/* описание */}
+                    <div className="text-sm text-gray-500 mt-1">
+                      {s.duration} мин{/* или s.description */}
+                    </div>
+                    {/* цена на новой строке */}
+                    <div className="text-base font-semibold text-black mt-2">
+                      {Number(s.price)} С
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    name="service"
+                    value={s.id}
+                    checked={form.serviceIds[0] === s.id}
+                    onChange={() =>
+                      setForm(f => ({ ...f, serviceIds: [s.id] }))
+                    }
+                    className="h-5 w-5 accent-pink-500 rounded-none"
+                  />
+                </label>
+              ))}
               </div>
               <Button 
                 onClick={() => setStep(2)}
