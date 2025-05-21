@@ -32,7 +32,9 @@ interface BookingForm {
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
   serviceIds: number[];
-  reminder_minutes: number
+  reminder_minutes: number;
+  acceptOffer: boolean;
+  conf: boolean
 }
 
 export interface Slots {
@@ -70,7 +72,9 @@ export function useBooking() {
     date: new Date().toISOString().split("T")[0],
     time: "",
     serviceIds: [],
-    reminder_minutes: 0
+    reminder_minutes: 0,
+    acceptOffer: false,
+    conf: false
   });
 
   // 1) загрузка услуг

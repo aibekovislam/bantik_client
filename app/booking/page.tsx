@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import MasterList from "@/components/sections/MasterList";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { NEXT_PUBLIC_API_URL } from "../lib/consts";
+import Logo from '@/public/Freedom_Pay_.svg'
+import Image from "next/image";
 
 export default function BookingPage() {
   const {
@@ -378,10 +380,58 @@ export default function BookingPage() {
                 </div>
                 </div>
 
+                <div className="flex items-start gap-3 mt-6">
+                  <input
+                    type="checkbox"
+                    id="acceptOffer"
+                    required
+                    checked={form.acceptOffer}
+                    onChange={(e) =>
+                      setForm(f => ({ ...f, acceptOffer: e.target.checked }))
+                    }
+                    className="h-5 w-5 shrink-0 accent-pink-500 rounded-none"
+                  />
+                  <label htmlFor="acceptOffer" className="text-sm leading-5">
+                    Я принимаю условия&nbsp;
+                    <a
+                      href="/docs/offer-v1.0.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-pink-600 underline hover:text-pink-700"
+                    >
+                      договора-оферты
+                    </a>
+                  </label>
+                </div>
+
+                <div className="flex items-start gap-3 mt-6">
+                  <input
+                    type="checkbox"
+                    id="acceptOffer3"
+                    required
+                    checked={form.conf}
+                    onChange={(e) =>
+                      setForm(f => ({ ...f, conf: e.target.checked }))
+                    }
+                    className="h-5 w-5 shrink-0 accent-pink-500 rounded-none"
+                  />
+                  <label htmlFor="acceptOffer" className="text-sm leading-5">
+                    Я принимаю условия&nbsp;
+                    <a
+                      href="/docs/offer-v2.0.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-pink-600 underline hover:text-pink-700"
+                    >
+                      политика конфиденциальности
+                    </a>
+                  </label>
+                </div>
+
                 <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
                   <Button
                     type="submit"
-                    disabled={submitting || loading || !form.clientName || !form.clientPhone}
+                    disabled={submitting || loading || !form.clientName || !form.clientPhone || !form.acceptOffer || !form.conf}
                     className="w-full sm:w-auto bg-gradient-to-r from-rose-600 to-pink-500 text-white px-8 py-2 rounded-xl shadow-lg hover:opacity-90 transition text-lg font-bold"
                   >
                     {submitting ? "Отправка..." : "Подтвердить"}
@@ -394,6 +444,10 @@ export default function BookingPage() {
                   >
                     Назад
                   </Button>
+                </div>
+
+                <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
+                  <Image src={Logo} alt="adsf"/>
                 </div>
               </Card>
             </form>
