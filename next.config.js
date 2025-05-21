@@ -6,6 +6,9 @@ const nextConfig = {
   experimental: {
     serverActions: true,
   },
+  images: {
+    domains: ['qrm.bantik.soulist.life'],
+  },
   async rewrites() {
     return [
       {
